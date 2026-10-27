@@ -1,0 +1,2255 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>С днем рождения, Алеська! ❤️</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Внешняя база данных контента (легко редактировать самому) -->
+  <script src="data.js"></script>
+  <style>
+    :root {
+      --bg-dark: #0b0d13;
+      --card-bg: rgba(23, 26, 35, 0.82);
+      --card-border: rgba(255, 107, 129, 0.2);
+      --accent-pink: #ff6b81;
+      --accent-soft: #ff8e9e;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+      line-height: 1.6;
+    }
+
+    #fx-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      transform: translateZ(0);
+      will-change: transform;
+    }
+
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 24px 18px 80px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .date-badge {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-pink);
+      background: rgba(255, 107, 129, 0.12);
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 107, 129, 0.25);
+    }
+
+    .music-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+    }
+
+    .music-btn.playing {
+      background: rgba(255, 107, 129, 0.25);
+      border-color: var(--accent-pink);
+      color: var(--accent-soft);
+    }
+
+    .music-btn.playing #musicIcon {
+      animation: spinTune 3s linear infinite;
+    }
+
+    @keyframes spinTune {
+      0% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.15) rotate(15deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 20px 10px 24px;
+    }
+
+    .hero-pre {
+      font-size: 13px;
+      color: var(--text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .hero h1 {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.25;
+      margin-bottom: 6px;
+      background: linear-gradient(135deg, #fff 30%, #ff8e9e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-nick {
+      font-family: 'Caveat', cursive;
+      font-size: 26px;
+      color: var(--accent-soft);
+      margin-bottom: 12px;
+    }
+
+    /* Timer */
+    .timer-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 18px 14px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+
+    .timer-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .timer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .time-box {
+      background: rgba(0, 0, 0, 0.35);
+      border-radius: 12px;
+      padding: 10px 4px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .time-num {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent-pink);
+      line-height: 1.1;
+    }
+
+    .time-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Section Titles */
+    .section-title-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+    }
+
+    .gallery-arrows {
+      display: flex;
+      gap: 6px;
+    }
+
+    .nav-arrow {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .nav-arrow:hover, .nav-arrow:active {
+      background: rgba(255, 107, 129, 0.3);
+      border-color: var(--accent-pink);
+    }
+
+    /* Photo Gallery */
+    .gallery-wrap {
+      margin-bottom: 35px;
+    }
+
+    .gallery-slider {
+      display: flex;
+      gap: 14px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      padding-bottom: 8px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 107, 129, 0.4) transparent;
+      user-select: none;
+    }
+
+    .gallery-slider::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .gallery-slider::-webkit-scrollbar-thumb {
+      background: rgba(255, 107, 129, 0.35);
+      border-radius: 4px;
+    }
+
+    .photo-card {
+      flex: 0 0 260px;
+      height: 350px;
+      border-radius: 18px;
+      overflow: hidden;
+      scroll-snap-align: center;
+      position: relative;
+      border: 1px solid var(--card-border);
+      background: #0f121a;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .photo-card:hover {
+      transform: translateY(-2px);
+      border-color: var(--accent-pink);
+    }
+
+    .photo-card-bg {
+      position: absolute;
+      top: -20px;
+      left: -20px;
+      right: -20px;
+      bottom: -20px;
+      background-size: cover;
+      background-position: center;
+      filter: blur(20px) brightness(0.38) saturate(1.2);
+      transform: scale(1.15);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .photo-card img {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      pointer-events: none;
+      padding: 10px 10px 48px;
+      box-sizing: border-box;
+    }
+
+    .photo-tag {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      right: 8px;
+      background: rgba(11, 13, 19, 0.88);
+      backdrop-filter: blur(10px);
+      padding: 7px 10px;
+      border-radius: 10px;
+      font-size: 11px;
+      color: #f3f4f6;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.14);
+      line-height: 1.35;
+      z-index: 3;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    /* Timeline */
+    .timeline {
+      position: relative;
+      margin-bottom: 35px;
+      padding-left: 20px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 6px;
+      top: 10px;
+      bottom: 10px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--accent-pink), rgba(255, 107, 129, 0.1));
+      border-radius: 2px;
+    }
+
+    .tl-item {
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .tl-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .tl-dot {
+      position: absolute;
+      left: -20px;
+      top: 6px;
+      width: 14px;
+      height: 14px;
+      background: var(--accent-pink);
+      border: 3px solid var(--bg-dark);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--accent-pink);
+    }
+
+    .tl-content {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 16px;
+      backdrop-filter: blur(8px);
+    }
+
+    .tl-date {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-pink);
+      margin-bottom: 4px;
+    }
+
+    .tl-head {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .tl-desc {
+      font-size: 13.5px;
+      color: #d1d5db;
+      line-height: 1.5;
+    }
+
+    /* Hug Box */
+    .hug-box {
+      background: linear-gradient(135deg, rgba(255, 107, 129, 0.15), rgba(255, 142, 158, 0.05));
+      border: 1px dashed var(--accent-pink);
+      border-radius: 18px;
+      padding: 18px;
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .hug-title {
+      font-size: 13.5px;
+      color: #e5e7eb;
+      margin-bottom: 4px;
+    }
+
+    .hug-count {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--accent-pink);
+      font-family: 'Caveat', cursive;
+    }
+
+    .hug-btn {
+      margin-top: 10px;
+      background: var(--accent-pink);
+      color: #fff;
+      border: none;
+      padding: 8px 22px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 107, 129, 0.4);
+      transition: transform 0.2s;
+    }
+
+    .hug-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Reasons Cards */
+    .reasons-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-bottom: 35px;
+    }
+
+    .reason-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      backdrop-filter: blur(8px);
+      transition: all 0.25s ease;
+      cursor: pointer;
+    }
+
+    .reason-card:active {
+      border-color: var(--accent-pink);
+      background: rgba(255, 107, 129, 0.12);
+    }
+
+    .reason-emoji {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .reason-text {
+      font-size: 13.5px;
+      color: #e5e7eb;
+    }
+
+    /* Secret Easter Egg: The Mark */
+    .secret-box {
+      margin-bottom: 35px;
+      border: 1px dashed rgba(255, 107, 129, 0.35);
+      border-radius: 16px;
+      padding: 16px;
+      background: rgba(255, 107, 129, 0.05);
+      text-align: center;
+    }
+
+    .secret-toggle-btn {
+      background: transparent;
+      border: 1px solid var(--accent-pink);
+      color: var(--accent-soft);
+      padding: 6px 16px;
+      border-radius: 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .secret-content {
+      display: none;
+      margin-top: 14px;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .secret-content.show {
+      display: block;
+    }
+
+    .secret-img-wrap {
+      max-width: 280px;
+      margin: 0 auto 10px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    .secret-img-wrap img {
+      width: 100%;
+      display: block;
+    }
+
+    .secret-desc {
+      font-size: 12.5px;
+      color: #d1d5db;
+      line-height: 1.45;
+    }
+
+    /* Secret Letter */
+    .letter-section {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .envelope {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 24px 18px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .envelope-icon {
+      font-size: 40px;
+      margin-bottom: 8px;
+      display: inline-block;
+      animation: bounce 2s infinite ease-in-out;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .envelope-hint {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--accent-soft);
+    }
+
+    .envelope-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .letter-content {
+      display: none;
+      text-align: left;
+      padding-top: 16px;
+      margin-top: 16px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+      animation: fadeIn 0.4s ease;
+    }
+
+    .letter-content.open {
+      display: block;
+    }
+
+    .letter-text {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: #f3f4f6;
+      white-space: pre-line;
+      margin-bottom: 16px;
+    }
+
+    .letter-sign {
+      text-align: right;
+      font-family: 'Caveat', cursive;
+      font-size: 24px;
+      color: var(--accent-pink);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5, 7, 11, 0.92);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 16px;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+
+    .lightbox.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    .lightbox-dialog {
+      position: relative;
+      max-width: 92vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: zoomIn 0.25s ease;
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    .lightbox-dialog img {
+      max-width: 100%;
+      max-height: 72vh;
+      border-radius: 14px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.85);
+      object-fit: contain;
+      display: block;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: -14px;
+      right: -14px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--accent-pink);
+      color: #fff;
+      border: 2px solid #fff;
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(255, 107, 129, 0.6);
+      z-index: 10;
+      transition: transform 0.2s ease;
+    }
+
+    .lightbox-close:active {
+      transform: scale(0.9);
+    }
+
+    .lb-nav-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: rgba(23, 26, 35, 0.88);
+      border: 1px solid var(--accent-pink);
+      color: #fff;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 10;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    }
+
+    .lb-nav-btn:hover, .lb-nav-btn:active {
+      background: var(--accent-pink);
+      transform: translateY(-50%) scale(1.08);
+    }
+
+    .lb-prev { left: -16px; }
+    .lb-next { right: -16px; }
+
+    .lb-counter {
+      margin-top: 6px;
+      font-size: 11.5px;
+      color: var(--accent-soft);
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    .lightbox-caption {
+      margin-top: 14px;
+      color: #f3f4f6;
+      font-size: 13.5px;
+      text-align: center;
+      max-width: 440px;
+      line-height: 1.45;
+      background: rgba(23, 26, 35, 0.85);
+      border: 1px solid var(--card-border);
+      padding: 10px 16px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    }
+
+    /* Secret Lock Dialog */
+    .secret-lock-dialog {
+      display: none;
+      margin-top: 14px;
+      padding: 14px;
+      background: rgba(23, 26, 35, 0.95);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .secret-pin-input {
+      width: 130px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      padding: 7px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--accent-pink);
+      background: #10131b;
+      color: #fff;
+      outline: none;
+    }
+
+    .secret-unlock-btn {
+      background: var(--accent-pink);
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .secret-unlock-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Floating Hug Feedback */
+    .hug-floater {
+      position: fixed;
+      font-family: 'Caveat', cursive;
+      font-size: 26px;
+      font-weight: 700;
+      color: #ff8e9e;
+      pointer-events: none;
+      z-index: 9999;
+      animation: floatUp 0.85s ease-out forwards;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(0) scale(0.85); opacity: 1; }
+      100% { transform: translateY(-70px) scale(1.25); opacity: 0; }
+    }
+
+    /* ===================================================
+       ИНТЕРАКТИВНЫЙ УГОЛОК (БАНОЧКА, КВИЗ, МИНИ-ИГРА)
+       =================================================== */
+    .interactive-zone {
+      margin-top: 36px;
+      margin-bottom: 24px;
+      background: rgba(23, 26, 35, 0.7);
+      border: 1px solid rgba(255, 107, 129, 0.22);
+      border-radius: 20px;
+      padding: 20px 16px;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .iz-tabs {
+      display: flex;
+      gap: 8px;
+      background: rgba(16, 19, 27, 0.85);
+      padding: 5px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      margin-bottom: 18px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .iz-tab {
+      flex: 1;
+      min-width: 90px;
+      text-align: center;
+      padding: 10px 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      white-space: nowrap;
+      user-select: none;
+      border: none;
+      background: transparent;
+    }
+
+    .iz-tab.active {
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent-pink), #e05268);
+      box-shadow: 0 3px 12px rgba(255, 107, 129, 0.4);
+    }
+
+    .iz-panel {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .iz-panel.active {
+      display: block;
+    }
+
+    /* 1. БАНОЧКА ПРИЧИН */
+    .jar-stage {
+      text-align: center;
+      padding: 10px 0;
+    }
+
+    .jar-visual {
+      font-size: 72px;
+      cursor: pointer;
+      display: inline-block;
+      transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      user-select: none;
+      filter: drop-shadow(0 6px 20px rgba(255, 107, 129, 0.35));
+    }
+
+    .jar-visual:hover {
+      transform: scale(1.1) rotate(4deg);
+    }
+
+    .jar-visual:active {
+      transform: scale(0.95);
+    }
+
+    .love-note-box {
+      min-height: 90px;
+      background: linear-gradient(145deg, rgba(30, 34, 46, 0.95), rgba(20, 23, 33, 0.95));
+      border: 1px dashed var(--accent-soft);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      transition: all 0.3s ease;
+    }
+
+    .love-note-text {
+      font-family: 'Caveat', cursive;
+      font-size: 23px;
+      line-height: 1.35;
+      color: #ffe4e8;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    }
+
+    .jar-btn {
+      background: linear-gradient(135deg, var(--accent-pink), #ff4757);
+      color: #fff;
+      border: none;
+      padding: 11px 22px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(255, 107, 129, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .jar-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 107, 129, 0.45);
+    }
+
+    .jar-counter {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* 2. КВИЗ */
+    .quiz-card {
+      background: rgba(16, 19, 27, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .quiz-progress {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--accent-soft);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    .quiz-q-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quiz-opt-btn {
+      background: rgba(30, 35, 48, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #e2e8f0;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .quiz-opt-btn:hover {
+      background: rgba(45, 52, 70, 0.9);
+      border-color: var(--accent-pink);
+    }
+
+    .quiz-opt-btn.correct {
+      background: rgba(34, 197, 94, 0.25) !important;
+      border-color: #22c55e !important;
+      color: #4ade80 !important;
+    }
+
+    .quiz-opt-btn.wrong {
+      background: rgba(239, 68, 68, 0.2) !important;
+      border-color: #ef4444 !important;
+      color: #fca5a5 !important;
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .quiz-feedback {
+      margin-top: 12px;
+      font-size: 13px;
+      min-height: 20px;
+      color: var(--accent-soft);
+      font-style: italic;
+    }
+
+    .quiz-win-box {
+      text-align: center;
+      padding: 20px 10px;
+    }
+
+    .quiz-win-trophy {
+      font-size: 60px;
+      margin-bottom: 12px;
+    }
+
+    .quiz-win-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .quiz-win-sub {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    /* 3. МИНИ-ИГРА ЛОВЕЦ */
+    .game-box {
+      position: relative;
+      background: #0d111a;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 107, 129, 0.25);
+    }
+
+    .game-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      background: rgba(16, 19, 27, 0.9);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 13.5px;
+      font-weight: 600;
+    }
+
+    .game-score {
+      color: #ffe4e8;
+    }
+
+    .game-timer {
+      color: var(--accent-soft);
+    }
+
+    #catcherCanvas {
+      display: block;
+      width: 100%;
+      height: 280px;
+      background: radial-gradient(circle at bottom, #191e2b 0%, #0d111a 80%);
+      touch-action: none;
+    }
+
+    .game-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 13, 19, 0.88);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+      z-index: 10;
+    }
+
+    .game-overlay-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .game-overlay-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      max-width: 280px;
+      line-height: 1.4;
+      margin-bottom: 16px;
+    }
+
+    .game-start-btn {
+      background: linear-gradient(135deg, var(--accent-pink), #ff4757);
+      color: #fff;
+      border: none;
+      padding: 11px 26px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(255, 107, 129, 0.4);
+      transition: transform 0.15s;
+    }
+
+    .game-start-btn:active {
+      transform: scale(0.95);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="fx-canvas"></canvas>
+
+  <div class="container">
+    
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="date-badge" id="heroBadge">✨ 3 ноября • Твой День</div>
+      <button class="music-btn" id="musicBtn" onclick="toggleMusic()">
+        <span id="musicIcon">🎵</span>
+        <span id="musicText">Включить мелодию</span>
+      </button>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="hero-pre" id="heroPre">Для самой любимой</div>
+      <h1 id="heroTitle">С днем рождения, Алеська! ❤️</h1>
+      <div class="hero-nick" id="heroNick">Моя самая любимая девочка</div>
+    </div>
+
+    <!-- Timer -->
+    <div class="timer-card">
+      <div class="timer-title" id="timerTitle">Мы с тобой вместе уже</div>
+      <div class="timer-grid">
+        <div class="time-box">
+          <div class="time-num" id="daysVal">0</div>
+          <div class="time-label">дней</div>
+        </div>
+        <div class="time-box">
+          <div class="time-num" id="hoursVal">0</div>
+          <div class="time-label">часов</div>
+        </div>
+        <div class="time-box">
+          <div class="time-num" id="minsVal">0</div>
+          <div class="time-label">минут</div>
+        </div>
+        <div class="time-box">
+          <div class="time-num" id="secsVal">0</div>
+          <div class="time-label">секунд</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Фотогалерея (Хроника наших моментов) -->
+    <div class="gallery-wrap">
+      <div class="section-title-wrap">
+        <div class="section-title">
+          <span>📸</span> Наши моменты
+        </div>
+        <div class="gallery-arrows">
+          <button class="nav-arrow" onclick="scrollGallery(-1)" title="Назад">◀</button>
+          <button class="nav-arrow" onclick="scrollGallery(1)" title="Вперед">▶</button>
+        </div>
+      </div>
+      
+      <div class="gallery-slider" id="photoSlider">
+        <!-- Карточки генерируются автоматически из data.js (GALLERY_STORIES) -->
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="section-title-wrap" style="margin-bottom: 18px;">
+      <div class="section-title">
+        <span>📍</span> Наша с тобой история
+      </div>
+    </div>
+
+    <div class="timeline" id="timelineWrap">
+      <!-- События генерируются автоматически из data.js (TIMELINE_EVENTS) -->
+    </div>
+
+    <!-- Секретная пасхалка 8 октября (Засос / Метка занятости с PIN-кодом) -->
+    <div class="secret-box">
+      <button class="secret-toggle-btn" id="secretToggleBtn" onclick="toggleSecret()">
+        <span>🔒</span> Секретный кадр 8 октября (Только для нас)
+      </button>
+
+      <div class="secret-lock-dialog" id="secretLockDialog">
+        <div id="secretLockPrompt" style="font-size: 13.5px; color: #f3f4f6; margin-bottom: 8px;">
+          🔐 Этот кадр под замком. Введи день и месяц первого сообщения (ДДММ):
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: center; align-items: center; margin-bottom: 6px;">
+          <input type="password" id="secretPinInput" class="secret-pin-input" maxlength="4" placeholder="••••" onkeydown="if(event.key==='Enter') checkSecretPin()">
+          <button class="secret-unlock-btn" onclick="checkSecretPin()">Открыть 💖</button>
+        </div>
+        <div id="secretPinError" style="color: #ff6b81; font-size: 12px; display: none;">Неверный код. Подсказка: день и месяц начала нашего чата (ДДММ) 😉</div>
+      </div>
+
+      <div class="secret-content" id="secretWrap">
+        <div class="secret-img-wrap" id="secretImgWrap" style="cursor: pointer;" onclick="openSecretLightbox()">
+          <img id="secretImg" src="images/story_10_secret_mark.jpg" alt="Метка занятости">
+        </div>
+        <div class="secret-desc" id="secretDesc">
+          Тот самый вечер, первый вечер наших отношений и то самое сообщение <em>«писда»</em> 🤭<br>
+          «Метка занятости», о которой знали только мы двое.
+        </div>
+      </div>
+    </div>
+
+    <!-- Обнимашки динамический счетчик -->
+    <div class="hug-box">
+      <div class="hug-title">Сколько раз мысленно и в чате я тебя обнял:</div>
+      <div class="hug-count" id="hugDisplay">... обнимашек</div>
+      <button class="hug-btn" onclick="addHug(event)">Обнять Тёму в ответ 🤗</button>
+    </div>
+
+    <!-- Мелочи -->
+    <div class="section-title-wrap" style="margin-bottom: 16px;">
+      <div class="section-title">
+        <span>✨</span> Мелочи, за которые я тебя обожаю
+      </div>
+    </div>
+
+    <div class="reasons-grid" id="reasonsGrid">
+      <!-- Карточки генерируются автоматически из data.js (REASONS_GRID) -->
+    </div>
+
+    <!-- Интерактивный уголок для Лесечки -->
+    <div class="interactive-zone" id="interactiveZone">
+      <div class="section-title-wrap" style="margin-bottom: 14px; text-align: center; justify-content: center;">
+        <div class="section-title" style="font-size: 19px;">
+          <span>🎡</span> Твой интерактивный уголок
+        </div>
+      </div>
+
+      <!-- Табы -->
+      <div class="iz-tabs">
+        <button class="iz-tab active" onclick="switchIzTab('jar')">✨ Баночка любви</button>
+        <button class="iz-tab" onclick="switchIzTab('quiz')">🧩 Квиз для Леси</button>
+        <button class="iz-tab" onclick="switchIzTab('game')">🎮 Игра «Ловец»</button>
+      </div>
+
+      <!-- Панель 1: Баночка причин -->
+      <div class="iz-panel active" id="izPanelJar">
+        <div class="jar-stage">
+          <div class="jar-visual" onclick="pullLoveNote()" title="Нажми на баночку!">
+            🏺
+          </div>
+          <div class="love-note-box">
+            <div class="love-note-text" id="loveNoteDisplay">
+              Нажми на баночку или кнопку внизу, чтобы вытянуть записку с причиной, почему я тебя люблю ❤️
+            </div>
+          </div>
+          <button class="jar-btn" onclick="pullLoveNote()">Вытянуть записку 💌</button>
+          <div class="jar-counter" id="jarCounter">Открыто причин: 0 (а всего их бесконечность ❤️)</div>
+        </div>
+      </div>
+
+      <!-- Панель 2: Квиз для Леси -->
+      <div class="iz-panel" id="izPanelQuiz">
+        <div class="quiz-card" id="quizCard">
+          <div class="quiz-progress">
+            <span id="quizStepText">Вопрос 1 из 7</span>
+            <span id="quizScoreText">✨ Воспоминания</span>
+          </div>
+          <div class="quiz-q-text" id="quizQuestionText">...</div>
+          <div class="quiz-options" id="quizOptionsWrap"></div>
+          <div class="quiz-feedback" id="quizFeedback"></div>
+        </div>
+
+        <div class="quiz-win-box" id="quizWinBox" style="display: none;">
+          <div class="quiz-win-trophy">🏆</div>
+          <div class="quiz-win-title">100% Знание нашей истории!</div>
+          <div class="quiz-win-sub">
+            Лесечка, ты идеально помнишь каждый наш теплый момент. Ты самая внимательная, заботливая и любимая девочка на свете ❤️
+          </div>
+          <button class="jar-btn" onclick="restartQuiz()">Пройти еще раз 🔄</button>
+        </div>
+      </div>
+
+      <!-- Панель 3: Игра «Ловец» -->
+      <div class="iz-panel" id="izPanelGame">
+        <div class="game-box">
+          <div class="game-top-bar">
+            <div class="game-score" id="gameScoreDisplay">Счет: 0 💖</div>
+            <div class="game-timer" id="gameTimerDisplay">Время: 30с ⏳</div>
+          </div>
+          <canvas id="catcherCanvas"></canvas>
+
+          <div class="game-overlay" id="gameOverlay">
+            <div class="game-overlay-title" id="gameOverTitle">Ловец сердечек и котиков 🐱❤️</div>
+            <div class="game-overlay-desc" id="gameOverDesc">
+              Управляй корзинкой пальцем или мышкой. Лови сердечки, вишенки, китиков и капюшоны!
+            </div>
+            <button class="game-start-btn" id="gameStartBtn" onclick="startGame()">Начать игру 🚀</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Интерактивное письмо (Лесечка) -->
+    <div class="letter-section">
+      <div class="envelope" onclick="openLetter()">
+        <div class="envelope-icon">💌</div>
+        <div class="envelope-hint" id="envelopeHint">Нажми, чтобы открыть письмо от меня</div>
+        <div class="envelope-sub" id="envelopeSub">Личное поздравление только для твоих глаз</div>
+
+        <div class="letter-content" id="letterText">
+          <div class="letter-text" id="letterBody">
+Лесечка, любимая моя! ❤️
+
+С днем рождения тебя, моё солнышко!
+
+Я хочу сказать тебе спасибо за то, что ты появилась в моей жизни. За каждую твою улыбку, за каждое «бусь», за твою заботу, за то, как ты встречаешь меня и как смотришь на меня. С тобой даже обычная поездка на автобусе или простой поход в магазин превращаются во что-то особенное и родное.
+
+Я безумно ценю каждую секунду рядом с тобой — когда мы смеемся до слез, когда ты заставляешь меня надеть капюшон, когда мы просто обнимаемся и не хочется никуда уходить.
+
+Я желаю тебе, чтобы все твои мечты сбывались легко и быстро. Чтобы ты всегда чувствовала себя счастливой, любимой и нужной. А я всегда буду рядом — чтобы поддержать, обнять, прикрыть от холода и просто быть твоим Тёмой.
+
+Ты самая лучшая, помни об этом всегда. Я очень сильно тебя люблю! ❤️
+
+P.S. А ещё кое-кто очень мягкий, желтый и плюшевый прямо сейчас упорно преодолевает все задержки доставки, чтобы скоро добраться до тебя и согревать, когда меня нет рядом... 🐱💛
+          </div>
+          <div class="letter-sign" id="letterSign">Всегда твой, Тёма ❤️</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Сделано с любовью для Алеськи • Ноябрь 2026
+    </footer>
+
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+    <div class="lightbox-dialog" onclick="event.stopPropagation()">
+      <button class="lightbox-close" onclick="closeLightbox()" title="Закрыть">&times;</button>
+      <button class="lb-nav-btn lb-prev" onclick="navLightbox(-1)" title="Предыдущее фото">◀</button>
+      <button class="lb-nav-btn lb-next" onclick="navLightbox(1)" title="Следующее фото">▶</button>
+      <img id="lightboxImg" src="" alt="Фото">
+      <div id="lightboxCaption" class="lightbox-caption"></div>
+      <div id="lightboxCounter" class="lb-counter">1 / 10</div>
+    </div>
+  </div>
+
+  <script>
+    // ==============================================================================
+    // 0. СВЯЗЬ С БАЗОЙ ДАННЫХ DATA.JS И ЗАЩИТА ОТ СБОЕВ (FALLBACKS)
+    // ==============================================================================
+    const CFG = window.APP_CONFIG || {};
+    const STORIES = (window.GALLERY_STORIES && window.GALLERY_STORIES.length > 0) ? window.GALLERY_STORIES : [];
+    const TIMELINE = (window.TIMELINE_EVENTS && window.TIMELINE_EVENTS.length > 0) ? window.TIMELINE_EVENTS : [];
+    const REASONS = (window.REASONS_GRID && window.REASONS_GRID.length > 0) ? window.REASONS_GRID : [];
+    const LOVE_NOTES = (window.LOVE_REASONS && window.LOVE_REASONS.length > 0) ? window.LOVE_REASONS : [];
+    const QUIZ_LIST = (window.QUIZ_QUESTIONS && window.QUIZ_QUESTIONS.length > 0) ? window.QUIZ_QUESTIONS : [];
+    const GAME_CFG = window.CATCHER_GAME_CONFIG || {};
+
+    // 1. Текстовые метаданные (Заголовки, бейджи, обращения)
+    function hydrateMeta() {
+      if (CFG.meta) {
+        if (CFG.meta.pageTitle) document.title = CFG.meta.pageTitle;
+        const b = document.getElementById('heroBadge'); if (b && CFG.meta.dateBadge) b.innerText = CFG.meta.dateBadge;
+        const p = document.getElementById('heroPre'); if (p && CFG.meta.heroPre) p.innerText = CFG.meta.heroPre;
+        const t = document.getElementById('heroTitle'); if (t && CFG.meta.heroTitle) t.innerText = CFG.meta.heroTitle;
+        const n = document.getElementById('heroNick'); if (n && CFG.meta.heroNick) n.innerText = CFG.meta.heroNick;
+      }
+    }
+
+    // 2. Таймер отношений (Точное время знакомства в Бибинто: 13.09.2026, 00:33 +07:00)
+    const startDate = new Date((CFG.timer && CFG.timer.startDate) || '2026-09-13T00:33:00+07:00');
+    const timerTitleEl = document.getElementById('timerTitle');
+    if (timerTitleEl && CFG.timer && CFG.timer.title) {
+      timerTitleEl.innerText = CFG.timer.title;
+    }
+
+    function updateTimer() {
+      const now = new Date();
+      const diff = now - startDate;
+
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const mins = Math.floor((diff / (1000 * 60)) % 60);
+        const secs = Math.floor((diff / 1000) % 60);
+
+        const d = document.getElementById('daysVal'); if (d) d.innerText = days;
+        const h = document.getElementById('hoursVal'); if (h) h.innerText = hours;
+        const m = document.getElementById('minsVal'); if (m) m.innerText = mins;
+        const s = document.getElementById('secsVal'); if (s) s.innerText = secs;
+      }
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // 3. Web Audio API Романтическая Музыкальная Шкатулка
+    class MusicBoxSynth {
+      constructor() {
+        this.ctx = null;
+        this.timer = null;
+        this.isPlaying = false;
+        this.step = 0;
+        this.sequence = [
+          523.25, 659.25, 783.99, 987.77, 1046.50, 783.99, 659.25, 783.99,
+          440.00, 523.25, 659.25, 880.00,  659.25, 523.25,
+          349.23, 440.00, 523.25, 698.46,  523.25, 440.00,
+          392.00, 493.88, 587.33, 783.99,  880.00, 783.99,
+          659.25, 830.61, 987.77, 880.00,  783.99, 659.25,
+          587.33, 698.46, 880.00, 783.99,  659.25, 587.33,
+          493.88, 587.33, 783.99, 659.25,  523.25
+        ];
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContextClass();
+        }
+      }
+
+      playNote(freq) {
+        if (!this.ctx) return;
+        const t = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, t);
+
+        const oscOver = this.ctx.createOscillator();
+        const gainOver = this.ctx.createGain();
+        oscOver.type = 'sine';
+        oscOver.frequency.setValueAtTime(freq * 2.76, t);
+
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.linearRampToValueAtTime(0.18, t + 0.006);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 1.4);
+
+        gainOver.gain.setValueAtTime(0.0001, t);
+        gainOver.gain.linearRampToValueAtTime(0.035, t + 0.004);
+        gainOver.gain.exponentialRampToValueAtTime(0.0001, t + 0.6);
+
+        osc.connect(gain);
+        oscOver.connect(gainOver);
+
+        gain.connect(this.ctx.destination);
+        gainOver.connect(this.ctx.destination);
+
+        osc.start(t);
+        oscOver.start(t);
+        osc.stop(t + 1.5);
+        oscOver.stop(t + 0.7);
+      }
+
+      start() {
+        this.init();
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+        this.isPlaying = true;
+        this.step = 0;
+        const tick = () => {
+          if (!this.isPlaying) return;
+          const freq = this.sequence[this.step % this.sequence.length];
+          this.playNote(freq);
+          this.step++;
+          this.timer = setTimeout(tick, 350);
+        };
+        tick();
+      }
+
+      stop() {
+        this.isPlaying = false;
+        if (this.timer) {
+          clearTimeout(this.timer);
+          this.timer = null;
+        }
+      }
+    }
+
+    const synth = new MusicBoxSynth();
+    const musicBtn = document.getElementById('musicBtn');
+    const musicText = document.getElementById('musicText');
+    const musicIcon = document.getElementById('musicIcon');
+
+    function toggleMusic() {
+      if (synth.isPlaying) {
+        synth.stop();
+        musicBtn.classList.remove('playing');
+        musicIcon.innerText = '🎵';
+        musicText.innerText = 'Включить мелодию';
+      } else {
+        synth.start();
+        musicBtn.classList.add('playing');
+        musicIcon.innerText = '✨';
+        musicText.innerText = 'Играет шкатулка 🎵';
+      }
+    }
+
+    // 4. Раскрытие письма
+    function openLetter() {
+      const content = document.getElementById('letterText');
+      content.classList.toggle('open');
+      if (content.classList.contains('open')) {
+        for (let i = 0; i < 15; i++) {
+          setTimeout(spawnHeart, i * 50);
+        }
+      }
+    }
+
+    // 5. Секретная пасхалка 8 октября с PIN-кодом
+    function openSecretLightbox() {
+      const secretIdx = galleryItems.findIndex(it => it.id === 10 || (it.src && it.src.includes('secret')));
+      openLightbox(secretIdx !== -1 ? secretIdx : 9);
+    }
+
+    function toggleSecret() {
+      const isUnlocked = sessionStorage.getItem('alesya_secret_unlocked') === 'true';
+      const wrap = document.getElementById('secretWrap');
+      const dialog = document.getElementById('secretLockDialog');
+
+      if (isUnlocked) {
+        wrap.classList.toggle('show');
+        if (wrap.classList.contains('show')) spawnHeart();
+      } else {
+        if (dialog.style.display === 'block') {
+          dialog.style.display = 'none';
+        } else {
+          dialog.style.display = 'block';
+          const input = document.getElementById('secretPinInput');
+          if (input) {
+            input.value = '';
+            input.focus();
+          }
+          document.getElementById('secretPinError').style.display = 'none';
+        }
+      }
+    }
+
+    function checkSecretPin() {
+      const input = document.getElementById('secretPinInput');
+      const err = document.getElementById('secretPinError');
+      const pin = input ? input.value.trim() : '';
+      const expectedPin = (CFG.secret && CFG.secret.pin) ? CFG.secret.pin : '1309';
+
+      if (pin === expectedPin) {
+        sessionStorage.setItem('alesya_secret_unlocked', 'true');
+        document.getElementById('secretLockDialog').style.display = 'none';
+        const wrap = document.getElementById('secretWrap');
+        wrap.classList.add('show');
+        if (err) err.style.display = 'none';
+        for (let i = 0; i < 8; i++) {
+          setTimeout(spawnHeart, i * 60);
+        }
+      } else {
+        if (err) err.style.display = 'block';
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+      }
+    }
+
+    // 6. Динамический счетчик обнимашек с SafeStorage + Haptic Feedback
+    const memoryStorage = {};
+    const safeStorage = {
+      get: (key, fallback) => {
+        try {
+          const val = localStorage.getItem(key);
+          return val !== null ? val : fallback;
+        } catch (e) {
+          return memoryStorage[key] !== undefined ? memoryStorage[key] : fallback;
+        }
+      },
+      set: (key, val) => {
+        try {
+          localStorage.setItem(key, String(val));
+        } catch (e) {
+          memoryStorage[key] = String(val);
+        }
+      }
+    };
+
+    const baseDate = new Date((CFG.hugs && CFG.hugs.baseDate) || '2026-10-27T00:00:00+07:00');
+    const baseCount = (CFG.hugs && CFG.hugs.baseCount) || 410;
+    const dailyInc = (CFG.hugs && CFG.hugs.dailyAutoIncrement) || 10;
+    const now = new Date();
+    const daysSinceExport = Math.max(0, Math.floor((now - baseDate) / (1000 * 60 * 60 * 24)));
+    const calculatedBase = baseCount + (daysSinceExport * dailyInc);
+
+    let savedClicks = parseInt(safeStorage.get('alesya_extra_hugs', '0'), 10);
+    if (isNaN(savedClicks)) savedClicks = 0;
+    let totalHugs = calculatedBase + savedClicks;
+
+    function renderHugs() {
+      const disp = document.getElementById('hugDisplay');
+      if (disp) disp.innerText = totalHugs + '+ обнимашек 🤗';
+    }
+    renderHugs();
+
+    function addHug(event) {
+      totalHugs++;
+      savedClicks++;
+      safeStorage.set('alesya_extra_hugs', savedClicks);
+      renderHugs();
+      spawnHeart();
+
+      if (navigator.vibrate) {
+        try { navigator.vibrate(40); } catch (e) {}
+      }
+      spawnHugFloater(event);
+    }
+
+    function spawnHugFloater(event) {
+      const floater = document.createElement('div');
+      floater.className = 'hug-floater';
+      floater.innerText = '+1 🤗';
+
+      let x = window.innerWidth / 2;
+      let y = window.innerHeight / 2;
+
+      if (event && event.clientX && event.clientY) {
+        x = event.clientX;
+        y = event.clientY;
+      } else {
+        const btn = document.querySelector('.hug-btn');
+        if (btn) {
+          const rect = btn.getBoundingClientRect();
+          x = rect.left + rect.width / 2;
+          y = rect.top;
+        }
+      }
+
+      floater.style.left = `${x}px`;
+      floater.style.top = `${y}px`;
+      document.body.appendChild(floater);
+
+      setTimeout(() => {
+        if (floater.parentNode) floater.parentNode.removeChild(floater);
+      }, 850);
+    }
+
+    // 7. Управление галереей (Слайдер, Lightbox, Drag, Touch Swipe)
+    const galleryItems = (STORIES && STORIES.length > 0) ? STORIES : [
+      { id: 1, src: 'images/story_1_ava_her.jpg', tag: '8 октября • Твоя ладонь у меня на голове. Твоя аватарка ❤️', caption: '8 октября • Твоя ладонь у меня на голове. Твоя аватарка ❤️' },
+      { id: 2, src: 'images/story_2_ava_his.jpg', tag: '«Моя попытка повторить твое фото»: моя рука на твоей голове 💫', caption: '«Моя попытка повторить твое фото»: моя рука на твоей голове 💫' },
+      { id: 3, src: 'images/story_3_first_selfie.jpg', tag: '8 октября • Первое селфи: неон, котенок и «только один день, а уже фотка есть» 🥰', caption: '8 октября • Первое селфи: неон, котенок и «только один день, а уже фотка есть» 🥰' },
+      { id: 4, src: 'images/story_4_kare_kitten.jpg', tag: '15 октября • Твое идеальное новое каре и котик на носу 🐱', caption: '15 октября • Твое идеальное новое каре и котик на носу 🐱' },
+      { id: 5, src: 'images/story_5_night_cuddle.jpg', tag: '17 октября • Уют под одеялом в темноте. Самые теплые минуты 🌙', caption: '17 октября • Уют под одеялом в темноте. Самые теплые минуты 🌙' },
+      { id: 6, src: 'images/story_6_mon_cheri.jpg', tag: '25 октября • «Не фоткай меня!». Футболка mon chéri и твоя улыбка 🍒', caption: '25 октября • «Не фоткай меня!». Футболка mon chéri и твоя улыбка 🍒' },
+      { id: 7, src: 'images/story_7_snowflake.jpg', tag: '2 октября • Первый снег: «эта подружка увидела красивую снежинку на мне» ❄️', caption: '2 октября • Первый снег: «эта подружка увидела красивую снежинку на мне» ❄️' },
+      { id: 8, src: 'images/story_8_cat_sphynx.jpg', tag: 'У бабушки с китиком. Нежность и уют 🐾', caption: 'У бабушки с китиком. Нежность и уют 🐾' },
+      { id: 9, src: 'images/story_9_minecraft.jpg', tag: 'Наш общий мир: сакуровый домик и princessa33345 🌸', caption: 'Наш общий мир: сакуровый домик и princessa33345 🌸' },
+      { id: 10, src: 'images/story_10_secret_mark.jpg', tag: '8 октября • Первый вечер наших отношений. «Метка занятости» 🤭', caption: '8 октября • Тот самый вечер, первый вечер наших отношений. «Метка занятости» 🤭' }
+    ];
+
+    let currentLbIndex = 0;
+    const slider = document.getElementById('photoSlider');
+
+    function renderGallerySlider() {
+      if (!slider) return;
+      slider.innerHTML = '';
+      galleryItems.forEach((item, idx) => {
+        if (item.id === 10 || item.isSecret) return; // Секретный кадр отображается в блоке под замком
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+        card.onclick = () => openLightbox(idx);
+        card.innerHTML = `
+          <div class="photo-card-bg" style="background-image: url('${item.src}');"></div>
+          <img src="${item.src}" alt="${item.caption || ''}">
+          <div class="photo-tag">${item.tag || item.caption || ''}</div>
+        `;
+        slider.appendChild(card);
+      });
+    }
+
+    function scrollGallery(direction) {
+      const scrollAmount = 265;
+      if (slider) slider.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+    }
+
+    if (slider) {
+      slider.addEventListener('wheel', (e) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          slider.scrollLeft += e.deltaY;
+        }
+      }, { passive: false });
+
+      let isDown = false;
+      let startX = 0;
+      let scrollLeft = 0;
+      let draggedDistance = 0;
+
+      slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        draggedDistance = 0;
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+        slider.style.cursor = 'grabbing';
+        slider.style.scrollSnapType = 'none';
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (isDown) {
+          isDown = false;
+          slider.style.cursor = 'grab';
+          slider.style.scrollSnapType = 'x mandatory';
+        }
+      });
+
+      slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        draggedDistance = Math.abs(x - startX);
+        slider.scrollLeft = scrollLeft - walk;
+      });
+    }
+
+    // Lightbox модальное окно
+    function updateLightboxView() {
+      const item = galleryItems[currentLbIndex];
+      if (!item) return;
+      const lbImg = document.getElementById('lightboxImg');
+      const lbCap = document.getElementById('lightboxCaption');
+      const lbCounter = document.getElementById('lightboxCounter');
+      if (lbImg) lbImg.src = item.src;
+      if (lbCap) lbCap.innerText = item.caption;
+      if (lbCounter) lbCounter.innerText = `${currentLbIndex + 1} / ${galleryItems.length}`;
+    }
+
+    function openLightbox(srcOrIndex) {
+      if (typeof srcOrIndex === 'number') {
+        currentLbIndex = srcOrIndex;
+      } else {
+        const idx = galleryItems.findIndex(item => item.src === srcOrIndex);
+        currentLbIndex = idx !== -1 ? idx : 0;
+      }
+      updateLightboxView();
+      const lb = document.getElementById('lightbox');
+      if (lb) lb.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox(e) {
+      if (e && e.target !== e.currentTarget && !e.target.classList.contains('lightbox-close')) return;
+      const lb = document.getElementById('lightbox');
+      if (lb) lb.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function navLightbox(direction) {
+      currentLbIndex = (currentLbIndex + direction + galleryItems.length) % galleryItems.length;
+      updateLightboxView();
+    }
+
+    const lbElem = document.getElementById('lightbox');
+    if (lbElem) {
+      let lbTouchStartX = 0;
+      let lbTouchEndX = 0;
+      lbElem.addEventListener('touchstart', (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+          lbTouchStartX = e.changedTouches[0].screenX;
+        }
+      }, { passive: true });
+
+      lbElem.addEventListener('touchend', (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+          lbTouchEndX = e.changedTouches[0].screenX;
+          const diffX = lbTouchEndX - lbTouchStartX;
+          if (Math.abs(diffX) > 40) {
+            if (diffX < 0) navLightbox(1);
+            else navLightbox(-1);
+          }
+        }
+      }, { passive: true });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      const lb = document.getElementById('lightbox');
+      if (lb && lb.classList.contains('active')) {
+        if (e.key === 'Escape') closeLightbox();
+        if (e.key === 'ArrowLeft') navLightbox(-1);
+        if (e.key === 'ArrowRight') navLightbox(1);
+      }
+    });
+
+    // 8. Таймлайн (История)
+    function renderTimeline() {
+      const wrap = document.getElementById('timelineWrap');
+      if (!wrap) return;
+      wrap.innerHTML = '';
+      TIMELINE.forEach(ev => {
+        const item = document.createElement('div');
+        item.className = 'tl-item';
+        item.innerHTML = `
+          <div class="tl-dot"></div>
+          <div class="tl-content">
+            <div class="tl-date">${ev.date}</div>
+            <div class="tl-head">${ev.title}</div>
+            <div class="tl-desc">${ev.desc}</div>
+          </div>
+        `;
+        wrap.appendChild(item);
+      });
+    }
+
+    // 9. Сетка причин обожания
+    function renderReasonsGrid() {
+      const grid = document.getElementById('reasonsGrid');
+      if (!grid) return;
+      grid.innerHTML = '';
+      REASONS.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'reason-card';
+        card.onclick = heartBurst;
+        card.innerHTML = `
+          <div class="reason-emoji">${r.emoji}</div>
+          <div class="reason-text">${r.text}</div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // 10. Секретный блок и письмо
+    function hydrateSecretAndLetter() {
+      if (CFG.secret) {
+        const btn = document.getElementById('secretToggleBtn');
+        if (btn && CFG.secret.buttonText) btn.innerHTML = `<span>🔒</span> ${CFG.secret.buttonText}`;
+        const promptEl = document.getElementById('secretLockPrompt');
+        if (promptEl && CFG.secret.dialogPrompt) promptEl.innerText = CFG.secret.dialogPrompt;
+        const errEl = document.getElementById('secretPinError');
+        if (errEl && CFG.secret.errorHint) errEl.innerText = CFG.secret.errorHint;
+        const imgEl = document.getElementById('secretImg');
+        if (imgEl && CFG.secret.imageSrc) imgEl.src = CFG.secret.imageSrc;
+        const descEl = document.getElementById('secretDesc');
+        if (descEl && CFG.secret.cardDescription) descEl.innerHTML = CFG.secret.cardDescription;
+      }
+
+      if (CFG.letter) {
+        const hintEl = document.getElementById('envelopeHint');
+        if (hintEl && CFG.letter.envelopeHint) hintEl.innerText = CFG.letter.envelopeHint;
+        const subEl = document.getElementById('envelopeSub');
+        if (subEl && CFG.letter.envelopeSub) subEl.innerText = CFG.letter.envelopeSub;
+        const bodyEl = document.getElementById('letterBody');
+        if (bodyEl && CFG.letter.body) bodyEl.innerText = CFG.letter.body;
+        const signEl = document.getElementById('letterSign');
+        if (signEl && CFG.letter.sign) signEl.innerText = CFG.letter.sign;
+      }
+    }
+
+    // 11. Интерактивный уголок (Табы, Баночка, Квиз, Игра)
+    function switchIzTab(tabName) {
+      document.querySelectorAll('.iz-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.iz-panel').forEach(p => p.classList.remove('active'));
+
+      if (tabName === 'jar') {
+        const tabs = document.querySelectorAll('.iz-tab');
+        if (tabs[0]) tabs[0].classList.add('active');
+        const p = document.getElementById('izPanelJar');
+        if (p) p.classList.add('active');
+      } else if (tabName === 'quiz') {
+        const tabs = document.querySelectorAll('.iz-tab');
+        if (tabs[1]) tabs[1].classList.add('active');
+        const p = document.getElementById('izPanelQuiz');
+        if (p) p.classList.add('active');
+      } else if (tabName === 'game') {
+        const tabs = document.querySelectorAll('.iz-tab');
+        if (tabs[2]) tabs[2].classList.add('active');
+        const p = document.getElementById('izPanelGame');
+        if (p) p.classList.add('active');
+        initCatcherCanvasSize();
+      }
+    }
+
+    // Баночка причин
+    const loveReasons = (LOVE_NOTES && LOVE_NOTES.length > 0) ? LOVE_NOTES : [
+      "За твое строгое и заботливое «Капюшон надень, холодно 😡»",
+      "За то, как ты говоришь «бусь» — и от этого внутри всё тает",
+      "Просто за то, что ты есть на этом свете. Моя самая любимая девочка ❤️"
+    ];
+
+    let seenReasons = [];
+    try {
+      const stored = localStorage.getItem('alesya_seen_reasons');
+      if (stored) seenReasons = JSON.parse(stored);
+    } catch(e) {}
+
+    function updateJarCounterDisplay() {
+      const el = document.getElementById('jarCounter');
+      if (el) el.innerText = `Открыто причин: ${seenReasons.length} (а всего их несчитанное количество ❤️)`;
+    }
+
+    function pullLoveNote() {
+      if (seenReasons.length >= loveReasons.length) {
+        seenReasons = [];
+      }
+      const available = [];
+      for (let i = 0; i < loveReasons.length; i++) {
+        if (!seenReasons.includes(i)) available.push(i);
+      }
+      const chosenIdx = available[Math.floor(Math.random() * available.length)];
+      seenReasons.push(chosenIdx);
+      try {
+        localStorage.setItem('alesya_seen_reasons', JSON.stringify(seenReasons));
+      } catch(e) {}
+
+      const noteEl = document.getElementById('loveNoteDisplay');
+      if (!noteEl) return;
+      noteEl.style.opacity = '0';
+      noteEl.style.transform = 'scale(0.92)';
+
+      setTimeout(() => {
+        noteEl.innerText = loveReasons[chosenIdx];
+        noteEl.style.transition = 'all 0.35s ease';
+        noteEl.style.opacity = '1';
+        noteEl.style.transform = 'scale(1)';
+        updateJarCounterDisplay();
+        for (let i = 0; i < 4; i++) {
+          setTimeout(spawnHeart, i * 60);
+        }
+      }, 150);
+    }
+    updateJarCounterDisplay();
+
+    // Квиз для Лесечки
+    const quizData = (QUIZ_LIST && QUIZ_LIST.length > 0) ? QUIZ_LIST : [
+      {
+        q: "Как мы впервые вышли на связь 13 сентября в 00:33?",
+        opts: [
+          "Стикер и анкета в Бибинто («где учишься?») 💬",
+          "Случайно списались в комментариях сообщества",
+          "Нас познакомили общие друзья в компании"
+        ],
+        correct: 0,
+        hint: "«пишется, но после тебя еще анки есть...» 😉"
+      }
+    ];
+
+    let quizCurrentStep = 0;
+
+    function renderQuizStep() {
+      const stepEl = document.getElementById('quizStepText');
+      const qTextEl = document.getElementById('quizQuestionText');
+      const optsWrap = document.getElementById('quizOptionsWrap');
+      const feedbackEl = document.getElementById('quizFeedback');
+
+      if (!stepEl || !qTextEl || !optsWrap || !feedbackEl) return;
+
+      if (quizCurrentStep >= quizData.length) {
+        document.getElementById('quizCard').style.display = 'none';
+        document.getElementById('quizWinBox').style.display = 'block';
+        for (let i = 0; i < 12; i++) {
+          setTimeout(spawnHeart, i * 70);
+        }
+        return;
+      }
+
+      const cur = quizData[quizCurrentStep];
+      stepEl.innerText = `Вопрос ${quizCurrentStep + 1} из ${quizData.length}`;
+      qTextEl.innerText = cur.q;
+      feedbackEl.innerText = '';
+      optsWrap.innerHTML = '';
+
+      cur.opts.forEach((optText, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt-btn';
+        btn.innerText = optText;
+        btn.onclick = () => handleQuizAnswer(idx, btn);
+        optsWrap.appendChild(btn);
+      });
+    }
+
+    function handleQuizAnswer(selectedIdx, btnElement) {
+      const cur = quizData[quizCurrentStep];
+      const feedbackEl = document.getElementById('quizFeedback');
+
+      if (selectedIdx === cur.correct) {
+        btnElement.classList.add('correct');
+        feedbackEl.innerHTML = '<span style="color:#4ade80;">В точку! Ты идеально помнишь этот момент 🥰</span>';
+        playGameCatchTone(880);
+        for (let i = 0; i < 3; i++) spawnHeart();
+
+        const allBtns = document.querySelectorAll('.quiz-opt-btn');
+        allBtns.forEach(b => b.style.pointerEvents = 'none');
+
+        setTimeout(() => {
+          quizCurrentStep++;
+          renderQuizStep();
+        }, 750);
+      } else {
+        btnElement.classList.add('wrong');
+        btnElement.disabled = true;
+        feedbackEl.innerHTML = `<span style="color:#ff8e9e;">Неа! Подсказка: ${cur.hint}</span>`;
+        if (navigator.vibrate) try { navigator.vibrate(30); } catch(e) {}
+      }
+    }
+
+    function restartQuiz() {
+      quizCurrentStep = 0;
+      document.getElementById('quizCard').style.display = 'block';
+      document.getElementById('quizWinBox').style.display = 'none';
+      renderQuizStep();
+    }
+    renderQuizStep();
+
+    // Мини-игра «Ловец»
+    let gameAudioCtx = null;
+    function playGameCatchTone(freq) {
+      try {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        if (!gameAudioCtx) gameAudioCtx = new AudioClass();
+        if (gameAudioCtx.state === 'suspended') gameAudioCtx.resume();
+        const osc = gameAudioCtx.createOscillator();
+        const g = gameAudioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq || 680, gameAudioCtx.currentTime);
+        g.gain.setValueAtTime(0.08, gameAudioCtx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, gameAudioCtx.currentTime + 0.12);
+        osc.connect(g);
+        g.connect(gameAudioCtx.destination);
+        osc.start();
+        osc.stop(gameAudioCtx.currentTime + 0.13);
+      } catch(e) {}
+    }
+
+    const cCanvas = document.getElementById('catcherCanvas');
+    const cCtx = cCanvas ? cCanvas.getContext('2d') : null;
+    let gameRunning = false;
+    let gameScore = 0;
+    const gameDuration = GAME_CFG.durationSeconds || 30;
+    let gameTimeLeft = gameDuration;
+    let gameTimerInterval = null;
+    let gameSpawnInterval = null;
+    let gameAnimFrame = null;
+    const basketWidth = GAME_CFG.basketWidth || 76;
+    const basketHeight = GAME_CFG.basketHeight || 22;
+    let basketX = 140;
+    let fallingItems = [];
+
+    function initCatcherCanvasSize() {
+      if (!cCanvas) return;
+      cCanvas.width = cCanvas.clientWidth || 340;
+      cCanvas.height = 280;
+      basketX = (cCanvas.width - basketWidth) / 2;
+    }
+
+    function handleBasketMove(clientX) {
+      if (!cCanvas) return;
+      const rect = cCanvas.getBoundingClientRect();
+      const relativeX = clientX - rect.left;
+      basketX = Math.max(0, Math.min(cCanvas.width - basketWidth, relativeX - basketWidth / 2));
+    }
+
+    if (cCanvas) {
+      cCanvas.addEventListener('mousemove', (e) => {
+        handleBasketMove(e.clientX);
+      });
+      cCanvas.addEventListener('touchmove', (e) => {
+        if (e.touches && e.touches[0]) {
+          handleBasketMove(e.touches[0].clientX);
+        }
+      }, { passive: true });
+    }
+
+    const itemTypes = (GAME_CFG.items && GAME_CFG.items.length > 0) ? GAME_CFG.items : [
+      { char: '❤️', pts: 1, speed: 2.3 },
+      { char: '🐱', pts: 2, speed: 2.8 },
+      { char: '🍒', pts: 1, speed: 2.1 },
+      { char: '🧥', pts: 3, speed: 3.2 }
+    ];
+
+    function spawnFallingItem() {
+      if (!gameRunning || !cCanvas) return;
+      const type = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+      fallingItems.push({
+        x: Math.random() * (cCanvas.width - 34) + 10,
+        y: -20,
+        speed: type.speed + Math.random() * 0.8,
+        char: type.char,
+        pts: type.pts
+      });
+    }
+
+    function startGame() {
+      initCatcherCanvasSize();
+      gameRunning = true;
+      gameScore = 0;
+      gameTimeLeft = gameDuration;
+      fallingItems = [];
+      document.getElementById('gameOverlay').style.display = 'none';
+      document.getElementById('gameScoreDisplay').innerText = `Счет: 0 💖`;
+      document.getElementById('gameTimerDisplay').innerText = `Время: ${gameTimeLeft}с ⏳`;
+
+      if (gameTimerInterval) clearInterval(gameTimerInterval);
+      if (gameSpawnInterval) clearInterval(gameSpawnInterval);
+
+      gameTimerInterval = setInterval(() => {
+        gameTimeLeft--;
+        const timerEl = document.getElementById('gameTimerDisplay');
+        if (timerEl) timerEl.innerText = `Время: ${gameTimeLeft}с ⏳`;
+        if (gameTimeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+
+      gameSpawnInterval = setInterval(spawnFallingItem, 580);
+      runGameLoop();
+    }
+
+    function endGame() {
+      gameRunning = false;
+      if (gameTimerInterval) clearInterval(gameTimerInterval);
+      if (gameSpawnInterval) clearInterval(gameSpawnInterval);
+      if (gameAnimFrame) cancelAnimationFrame(gameAnimFrame);
+
+      const overlay = document.getElementById('gameOverlay');
+      const title = document.getElementById('gameOverTitle');
+      const desc = document.getElementById('gameOverDesc');
+      const btn = document.getElementById('gameStartBtn');
+
+      if (overlay) overlay.style.display = 'flex';
+      if (title) title.innerText = 'Победа! 🎉';
+      if (desc) desc.innerHTML = `Лесечка, ты поймала <strong>${gameScore}</strong> очков любви!<br>Тёма дарит тебе миллион поцелуев и самые крепкие объятия! ❤️`;
+      if (btn) btn.innerText = 'Сыграть еще раз 🎮';
+
+      for (let i = 0; i < 10; i++) {
+        setTimeout(spawnHeart, i * 70);
+      }
+    }
+
+    function runGameLoop() {
+      if (!gameRunning || !cCtx) return;
+      cCtx.clearRect(0, 0, cCanvas.width, cCanvas.height);
+
+      const bY = cCanvas.height - 32;
+      cCtx.fillStyle = 'rgba(255, 107, 129, 0.9)';
+      cCtx.shadowColor = '#ff6b81';
+      cCtx.shadowBlur = 12;
+      cCtx.beginPath();
+      if (cCtx.roundRect) {
+        cCtx.roundRect(basketX, bY, basketWidth, basketHeight, 10);
+      } else {
+        cCtx.rect(basketX, bY, basketWidth, basketHeight);
+      }
+      cCtx.fill();
+      cCtx.shadowBlur = 0;
+
+      cCtx.fillStyle = '#ffffff';
+      cCtx.font = 'bold 11px sans-serif';
+      cCtx.textAlign = 'center';
+      cCtx.fillText('🧺 Лесечка', basketX + basketWidth / 2, bY + 15);
+
+      for (let i = fallingItems.length - 1; i >= 0; i--) {
+        const it = fallingItems[i];
+        it.y += it.speed;
+
+        cCtx.font = '22px sans-serif';
+        cCtx.fillText(it.char, it.x, it.y);
+
+        if (it.y >= bY && it.y <= bY + basketHeight + 10 && it.x >= basketX - 12 && it.x <= basketX + basketWidth + 12) {
+          gameScore += it.pts;
+          const scoreEl = document.getElementById('gameScoreDisplay');
+          if (scoreEl) scoreEl.innerText = `Счет: ${gameScore} 💖`;
+          playGameCatchTone(600 + it.pts * 120);
+          if (navigator.vibrate) try { navigator.vibrate(25); } catch(e) {}
+          fallingItems.splice(i, 1);
+          continue;
+        }
+
+        if (it.y > cCanvas.height + 25) {
+          fallingItems.splice(i, 1);
+        }
+      }
+
+      gameAnimFrame = requestAnimationFrame(runGameLoop);
+    }
+
+    // 12. Анимация сердечек на канвасе
+    const canvas = document.getElementById('fx-canvas');
+    const ctx = canvas.getContext('2d', { alpha: true });
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    let lastInnerWidth = window.innerWidth;
+    window.addEventListener('resize', () => {
+      if (window.innerWidth !== lastInnerWidth) {
+        lastInnerWidth = window.innerWidth;
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+    });
+
+    const MAX_PARTICLES = 16;
+    const particles = [];
+    const symbols = ['❤️', '💖', '✨', '🌸'];
+
+    function spawnHeart(x, y) {
+      if (particles.length >= MAX_PARTICLES) return;
+      particles.push({
+        x: x || (Math.random() * (width - 40) + 20),
+        y: y || (height + 20),
+        size: Math.floor(Math.random() * 8 + 14),
+        speedY: Math.random() * 1.2 + 0.9,
+        speedX: (Math.random() - 0.5) * 0.8,
+        opacity: 0.9,
+        char: symbols[Math.floor(Math.random() * symbols.length)]
+      });
+    }
+
+    function heartBurst(e) {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      for (let i = 0; i < 5; i++) {
+        if (particles.length < MAX_PARTICLES + 5) {
+          particles.push({
+            x: x,
+            y: y,
+            size: 16,
+            speedY: (Math.random() - 0.6) * 2.5,
+            speedX: (Math.random() - 0.5) * 3,
+            opacity: 1,
+            char: '❤️'
+          });
+        }
+      }
+    }
+
+    setInterval(() => {
+      if (particles.length < 12) {
+        spawnHeart();
+      }
+    }, 1200);
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.y -= p.speedY;
+        p.x += p.speedX;
+        p.opacity -= 0.0035;
+
+        if (p.opacity <= 0 || p.y < -30) {
+          particles.splice(i, 1);
+          continue;
+        }
+
+        ctx.globalAlpha = p.opacity;
+        ctx.font = `${p.size}px sans-serif`;
+        ctx.fillText(p.char, p.x, p.y);
+      }
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    // ==============================================================================
+    // 13. ИНИЦИАЛИЗАЦИЯ ВСЕХ ДИНАМИЧЕСКИХ ДАННЫХ ПРИ ЗАГРУЗКЕ
+    // ==============================================================================
+    hydrateMeta();
+    renderGallerySlider();
+    renderTimeline();
+    renderReasonsGrid();
+    hydrateSecretAndLetter();
+  </script>
+</body>
+</html>
